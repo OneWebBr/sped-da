@@ -81,6 +81,13 @@ class Danfe extends DaCommon
      */
     public $descProdInfoLoteTxt = true;
     /**
+     * Define onde a informação do fisco (infFisco) será exibida no DANFE.
+     *
+     * true  (default) -> área específica do fisco no PDF
+     * false          -> junto das Informações Complementares
+     */
+    public bool $exibirInfFiscoEmAreaPropria = true;
+    /**
      * Parâmetro do controle se deve gerar quebras de linha com "\n" a partir de ";" na descrição do produto.
      *
      * @var boolean
@@ -92,13 +99,6 @@ class Danfe extends DaCommon
      * @var boolean
      */
     protected $ocultarUnidadeTributavel = false;
-    /**
-     * Define onde a informação do fisco (infFisco) será exibida no DANFE.
-     *
-     * true  (default) -> área específica do fisco no PDF
-     * false          -> junto das Informações Complementares
-     */
-    protected bool $exibirInfFiscoEmAreaPropria = true;
     /**
      * XML NFe
      *
