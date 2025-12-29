@@ -93,6 +93,13 @@ class Danfe extends DaCommon
      */
     protected $ocultarUnidadeTributavel = false;
     /**
+     * Define onde a informação do fisco (infFisco) será exibida no DANFE.
+     *
+     * true  (default) -> área específica do fisco no PDF
+     * false          -> junto das Informações Complementares
+     */
+    protected bool $exibirInfFiscoEmAreaPropria = true;
+    /**
      * XML NFe
      *
      * @var string
@@ -426,10 +433,11 @@ class Danfe extends DaCommon
             if ($this->exibirEmailDestinatario) {
                 $this->textoAdic .= $this->getTagValue($this->dest, "email", ' Email do Destinatário: ');
             }
-            /*
-            $this->textoAdic .= !empty($this->getTagValue($this->infAdic, "infAdFisco"))
-                ? "\n Inf. fisco: " . $this->getTagValue($this->infAdic, "infAdFisco")
-                : ''; */
+            if (!$this->exibirInfFiscoEmAreaPropria) {
+                $this->textoAdic .= !empty($this->getTagValue($this->infAdic, "infAdFisco"))
+                    ? "\n Inf. fisco: " . $this->getTagValue($this->infAdic, "infAdFisco")
+                    : '';
+            }
             if ($this->obsshow) {
                 $obsCont = $this->infAdic->getElementsByTagName("obsCont");
                 if (isset($obsCont)) {
@@ -452,7 +460,7 @@ class Danfe extends DaCommon
             $flagVTT = $flagVTT || strpos(strtolower(trim($this->textoAdic)), 'vl');
             $flagVTT = $flagVTT && strpos(strtolower(trim($this->textoAdic)), 'aprox');
             $flagVTT = $flagVTT && (strpos(strtolower(trim($this->textoAdic)), 'trib') ||
-                strpos(strtolower(trim($this->textoAdic)), 'imp'));
+                    strpos(strtolower(trim($this->textoAdic)), 'imp'));
             $vTotTrib = $this->getTagValue($this->ICMSTot, 'vTotTrib');
             if ($vTotTrib != '' && !$flagVTT) {
                 $this->textoAdic .= "\n Valor Aproximado dos Tributos : R$ "
@@ -2740,7 +2748,7 @@ class Danfe extends DaCommon
         }
         $infAdProd = !empty($itemProd->getElementsByTagName('infAdProd')->item(0)->nodeValue)
             ? substr(
-                //$this->anfaveaDANFE($itemProd->getElementsByTagName('infAdProd')->item(0)->nodeValue),
+            //$this->anfaveaDANFE($itemProd->getElementsByTagName('infAdProd')->item(0)->nodeValue),
                 $itemProd->getElementsByTagName('infAdProd')->item(0)->nodeValue,
                 0,
                 500
@@ -2759,16 +2767,16 @@ class Danfe extends DaCommon
                 if ($rastro->length === 1) {
                     $i = 0;
                     //while ($i < $rastro->length) {
-                        $dFab = $this->getTagDate($rastro->item($i), 'dFab');
-                        $datafab = " Fab: " . $dFab;
-                        $dVal = $this->getTagDate($rastro->item($i), 'dVal');
-                        $dataval = " Val: " . $dVal;
-                        $loteTxt .= $this->getTagValue($rastro->item($i), 'nLote', ' Lote: ');
-                        $loteTxt .= $this->getTagValue($rastro->item($i), 'qLote', ' Quant: ');
-                        $loteTxt .= $datafab; //$this->getTagDate($rastro->item($i), 'dFab', ' Fab: ');
-                        $loteTxt .= $dataval; //$this->getTagDate($rastro->item($i), 'dVal', ' Val: ');
-                        $loteTxt .= $this->getTagValue($rastro->item($i), 'vPMC', ' PMC: ');
-                        //$i++;
+                    $dFab = $this->getTagDate($rastro->item($i), 'dFab');
+                    $datafab = " Fab: " . $dFab;
+                    $dVal = $this->getTagDate($rastro->item($i), 'dVal');
+                    $dataval = " Val: " . $dVal;
+                    $loteTxt .= $this->getTagValue($rastro->item($i), 'nLote', ' Lote: ');
+                    $loteTxt .= $this->getTagValue($rastro->item($i), 'qLote', ' Quant: ');
+                    $loteTxt .= $datafab; //$this->getTagDate($rastro->item($i), 'dFab', ' Fab: ');
+                    $loteTxt .= $dataval; //$this->getTagDate($rastro->item($i), 'dVal', ' Val: ');
+                    $loteTxt .= $this->getTagValue($rastro->item($i), 'vPMC', ' PMC: ');
+                    //$i++;
                     //}
                 }
                 if ($loteTxt != '') {
@@ -3231,10 +3239,10 @@ class Danfe extends DaCommon
                     if ($pag == $totpag) {
                         $totpag++;
                     }
-                        //ultrapassa a capacidade para uma única página
-                        //o restante dos dados serão usados nas proximas paginas
-                        $nInicio = $i;
-                        break;
+                    //ultrapassa a capacidade para uma única página
+                    //o restante dos dados serão usados nas proximas paginas
+                    $nInicio = $i;
+                    break;
                 }
 
                 $y_linha = $y + $h;
@@ -3788,11 +3796,13 @@ class Danfe extends DaCommon
         }
         $y     += 2;
         $aFont = ['font' => $this->fontePadrao, 'size' => 7, 'style' => ''];
-        $inf = $this->getTagValue($this->infNFe, 'infAdFisco', '');
-        if (!empty($texto)) {
-            $texto = $texto . "\n" . $inf;
-        } elseif (!empty($inf)) {
-            $texto = $inf;
+        if ($this->exibirInfFiscoEmAreaPropria) {
+            $inf = $this->getTagValue($this->infNFe, 'infAdFisco', '');
+            if (!empty($texto)) {
+                $texto = $texto . "\n" . $inf;
+            } elseif (!empty($inf)) {
+                $texto = $inf;
+            }
         }
         $this->pdf->textBox($x, $y, $w - 2, $h, $texto, $aFont, 'T', 'L', 0, '', false);
 
