@@ -100,6 +100,17 @@ class Danfe extends DaCommon
      */
     protected $ocultarUnidadeTributavel = false;
     /**
+     * Parâmetro para exibir ou ocultar o indPag (Á vista ou Á prazo) do tipo de pagamento da duplicata
+     *
+     * @var boolean
+     */
+    public $exibirIndPagDuplicatas = false;
+    /**
+     * Valor do indPag para pagamento á vista, conforme NT
+     * @var String
+     */
+    private const IND_PAG_A_VISTA = '0';
+    /**
      * XML NFe
      *
      * @var string
@@ -1950,13 +1961,40 @@ class Danfe extends DaCommon
                     return $texto;
                 } else {
                     $pag = $this->dom->getElementsByTagName("pag");
+                    $indPag = $this->getTagValue($pag->item(0), "indPag") ?? null;
+                    $textoIndPagDup = $this->getTextoIndPagDuplicata($indPag);
+
                     if ($tPag = $this->getTagValue($pag->item(0), "tPag")) {
-                        return $this->tipoPag($tPag);
+                        return $this->tipoPag($tPag) . $textoIndPagDup;
                     }
                 }
             }
         }
         return "";
+    }
+
+    /**
+     * Retorna o texto conforme a tag indPag dos pagamentos, para exibir
+     * se o pagamento foi á vista ou á prazo
+     *
+     * @param string|null $indPag
+     * @return string
+     */
+    private function getTextoIndPagDuplicata(?string $indPag = null): string
+    {
+        $textoIndPag = '';
+        if (!$this->exibirIndPagDuplicatas) {
+            return $textoIndPag;
+        }
+
+        if (!is_null($indPag)) {
+            $textoIndPag = ' - Á prazo';
+            if ($indPag == self::IND_PAG_A_VISTA) {
+                $textoIndPag = ' - Á vista';
+            }
+        }
+
+        return $textoIndPag;
     }
 
     /**
@@ -2194,6 +2232,12 @@ class Danfe extends DaCommon
                         "."
                     )
                     : '';
+
+                $indPag = !is_null($this->detPag->item($k)->getElementsByTagName('indPag')->item(0)->nodeValue)
+                    ? $this->detPag->item($k)->getElementsByTagName('indPag')->item(0)->nodeValue
+                    : null;
+                $textoIndPagDup = $this->getTextoIndPagDuplicata($indPag);
+
                 $h = 6;
                 $texto = '';
                 if (isset($formaPagamento[$fPag])) {
@@ -2204,7 +2248,7 @@ class Danfe extends DaCommon
                     $aFont = ['font' => $this->fontePadrao, 'size' => 6, 'style' => ''];
                     $this->pdf->textBox($x, $y, $w, $h, 'Forma', $aFont, 'T', 'L', 1, '');
                     $aFont = ['font' => $this->fontePadrao, 'size' => 7, 'style' => 'B'];
-                    $this->pdf->textBox($x, $y, $w, $h, $formaPagamento[$fPag], $aFont, 'T', 'R', 0, '');
+                    $this->pdf->textBox($x, $y, $w, $h, $formaPagamento[$fPag] .  $textoIndPagDup, $aFont, 'T', 'R', 0, '');
                 } else {
                     $aFont = ['font' => $this->fontePadrao, 'size' => 7, 'style' => ''];
                     $this->pdf->textBox($x, $y, $w, $h, "Forma " . $fPag . " não encontrado", $aFont, 'T', 'L', 1, '');
