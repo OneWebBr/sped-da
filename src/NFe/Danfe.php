@@ -2233,7 +2233,7 @@ class Danfe extends DaCommon
                     )
                     : '';
 
-                $indPag = !is_null($this->detPag->item($k)->getElementsByTagName('indPag')->item(0)->nodeValue)
+                $indPag = isset($this->detPag->item($k)->getElementsByTagName('indPag')->item(0)->nodeValue)
                     ? $this->detPag->item($k)->getElementsByTagName('indPag')->item(0)->nodeValue
                     : null;
                 $textoIndPagDup = $this->getTextoIndPagDuplicata($indPag);
