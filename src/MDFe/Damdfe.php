@@ -63,6 +63,7 @@ class Damdfe extends DaCommon
     protected $qCTe;
     protected $qCT;
     protected $qCarga;
+    protected $vCarga;
     protected $cUnid;
     protected $infModal;
     protected $rodo;
@@ -165,6 +166,10 @@ class Damdfe extends DaCommon
             $this->qCT = "";
             if ($this->dom->getElementsByTagName("qCT")->item(0) != "") {
                 $this->qCT = $this->dom->getElementsByTagName("qCT")->item(0)->nodeValue;
+            }
+            $this->vCarga = "";
+            if ($this->dom->getElementsByTagName("vCarga")->item(0) != "") {
+                $this->vCarga = $this->dom->getElementsByTagName("vCarga")->item(0)->nodeValue;
             }
             $this->qCarga = $this->dom->getElementsByTagName("qCarga")->item(0)->nodeValue;
             $this->cUnid = $this->dom->getElementsByTagName("cUnid")->item(0)->nodeValue;
@@ -846,6 +851,19 @@ class Damdfe extends DaCommon
         $this->pdf->code128($x1 + 5, $y + 2, $this->chMDFe, ($maxW / 2) - 10, $bH);
         $this->pdf->setFillColor(255, 255, 255);
 
+        $y += 11;
+        $x1 = $x;
+        $wValorCarga = ($maxW / 2) - 1;
+        $this->pdf->setFillColor(235, 236, 238);
+        $this->pdf->textBox($x1, $y, $wValorCarga, 10, '', $this->baseFont, 'T', 'L', 0, '', 0, 0, 0, 1);
+        $texto = 'Valor Total da Carga';
+        $aFont = array('font' => $this->fontePadrao, 'size' => 8, 'style' => '');
+        $this->pdf->textBox($x1, $y, $wValorCarga, 8, $texto, $aFont, 'T', 'L', 0, '', false);
+        $texto = empty($this->vCarga) ? '' : 'R$ ' . number_format((float)$this->vCarga, 2, ',', '.');
+        $aFont = array('font' => $this->fontePadrao, 'size' => 9, 'style' => 'B');
+        $this->pdf->textBox($x1, $y + 4, $wValorCarga, 4, $texto, $aFont, 'T', 'L', 0, '', false);
+        $this->pdf->setFillColor(255, 255, 255);
+
         $temPercursos = ($this->infPercurso->length > 0);
         if ($temPercursos) {
             $x1 = $x;
@@ -909,17 +927,17 @@ class Damdfe extends DaCommon
             $aFont = array('font' => $this->fontePadrao, 'size' => 8, 'style' => 'B');
             $this->pdf->textBox($x1, $y, $x2, 8, $texto, $aFont, 'T', 'L', 0, '', false);
             $y += 5;
-            $x2 = round($maxW / 4, 0);
+            $x2 = round($maxW / 6, 0);
             $tamanho = 22;
-            $this->pdf->textBox($x1, $y, $x2, $tamanho, '', $this->baseFont, 'T', 'L', 0);
-            $texto = 'Placa';
-            $aFont = array('font' => $this->fontePadrao, 'size' => 8, 'style' => '');
-            $this->pdf->textBox($x1, $y, $x2, 8, $texto, $aFont, 'T', 'L', 0, '', false);
-            $texto = $this->veicTracao->getElementsByTagName("placa")->item(0)->nodeValue;
-            $aFont = array('font' => $this->fontePadrao, 'size' => 8, 'style' => 'B');
-            $this->pdf->textBox($x1, $y + 4, $x2, 10, $texto, $aFont, 'T', 'L', 0, '', false);
-
-            $altura = $y + 4;
+            $veiculos = [];
+            $prop = $this->veicTracao->getElementsByTagName("prop")->item(0);
+            $veiculos[] = [
+                'placa' => $this->veicTracao->getElementsByTagName("placa")->item(0)->nodeValue ?? '',
+                'rntrc' => !empty($prop)
+                    ? ($prop->getElementsByTagName("RNTRC")->item(0)->nodeValue ?? '')
+                    : ($this->RNTRC ?? ''),
+                'renavam' => $this->veicTracao->getElementsByTagName("RENAVAM")->item(0)->nodeValue ?? ''
+            ];
             /**
              * @var \DOMNodeList $veicReboque
              */
@@ -928,35 +946,44 @@ class Damdfe extends DaCommon
                 /**
                  * @var \DOMElement $item
                  */
-                $altura += 4;
-                $texto = $item->getElementsByTagName('placa')->item(0)->nodeValue;
-                $this->pdf->textBox($x1, $altura, $x2, 8, $texto, $aFont, 'T', 'L', 0, '', false);
+                $veiculos[] = [
+                    'placa' => $item->getElementsByTagName('placa')->item(0)->nodeValue ?? '',
+                    'rntrc' => $item->getElementsByTagName('RNTRC')->item(0)->nodeValue ?? '',
+                    'renavam' => $item->getElementsByTagName('RENAVAM')->item(0)->nodeValue ?? ''
+                ];
             }
+            $this->pdf->textBox($x1, $y, $x2, $tamanho, '', $this->baseFont, 'T', 'L', 0);
+            $texto = 'Placa';
+            $aFont = array('font' => $this->fontePadrao, 'size' => 8, 'style' => '');
+            $this->pdf->textBox($x1, $y, $x2, 8, $texto, $aFont, 'T', 'L', 0, '', false);
+            $aFont = array('font' => $this->fontePadrao, 'size' => 8, 'style' => 'B');
+            $altura = $y + 4;
+            foreach ($veiculos as $veiculo) {
+                $this->pdf->textBox($x1, $altura, $x2, 8, $veiculo['placa'], $aFont, 'T', 'L', 0, '', false);
+                $altura += 4;
+            }
+
             $x1 += $x2;
             $this->pdf->textBox($x1, $y, $x2, $tamanho, '', $this->baseFont, 'T', 'L', 0);
             $texto = 'RNTRC';
             $aFont = array('font' => $this->fontePadrao, 'size' => 8, 'style' => '');
             $this->pdf->textBox($x1, $y, $x2, 8, $texto, $aFont, 'T', 'L', 0, '', false);
-            $prop = $this->veicTracao->getElementsByTagName("prop")->item(0);
-            if (!empty($prop)) {
-                $texto = $prop->getElementsByTagName("RNTRC")->item(0)->nodeValue ?? '';
-            } else {
-                $texto = $this->RNTRC ?? '';
-            }
             $aFont = array('font' => $this->fontePadrao, 'size' => 8, 'style' => 'B');
-            $this->pdf->textBox($x1, $y + 4, $x2, 10, $texto, $aFont, 'T', 'L', 0, '', false);
             $altura = $y + 4;
-            $veicReboque = $this->veicReboque;
-            foreach ($veicReboque as $item) {
-                /**
-                 * @var \DOMElement $item
-                 */
-                $DOMNodeList = $item->getElementsByTagName('RNTRC');
-                if ($DOMNodeList->length > 0) {
-                    $altura += 4;
-                    $texto = $DOMNodeList->item(0)->nodeValue ?? '';
-                    $this->pdf->textBox($x1, $altura, $x2, 10, $texto, $aFont, 'T', 'L', 0, '', false);
-                }
+            foreach ($veiculos as $veiculo) {
+                $this->pdf->textBox($x1, $altura, $x2, 10, $veiculo['rntrc'], $aFont, 'T', 'L', 0, '', false);
+                $altura += 4;
+            }
+            $x1 += $x2;
+            $this->pdf->textBox($x1, $y, $x2, $tamanho, '', $this->baseFont, 'T', 'L', 0);
+            $texto = 'RENAVAM';
+            $aFont = array('font' => $this->fontePadrao, 'size' => 8, 'style' => '');
+            $this->pdf->textBox($x1, $y, $x2, 8, $texto, $aFont, 'T', 'L', 0, '', false);
+            $aFont = array('font' => $this->fontePadrao, 'size' => 8, 'style' => 'B');
+            $altura = $y + 4;
+            foreach ($veiculos as $veiculo) {
+                $this->pdf->textBox($x1, $altura, $x2, 10, $veiculo['renavam'], $aFont, 'T', 'L', 0, '', false);
+                $altura += 4;
             }
             $x1 = $x;
             $y += 22;
