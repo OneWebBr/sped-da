@@ -1041,7 +1041,8 @@ class Damdfe extends DaCommon
             $altura = $y;
             for ($i = 0; $i < $valesPedagios; $i++) {
                 $altura += 4;
-                $texto = $this->valePed->item($i)->getElementsByTagName('nCompra')->item(0)->nodeValue;
+                $nCompra = $this->valePed->item($i)->getElementsByTagName('nCompra')->item(0);
+                $texto = $nCompra ? $nCompra->nodeValue : '';
                 $aFont = array('font' => $this->fontePadrao, 'size' => 9, 'style' => '');
                 $this->pdf->textBox($x1, $altura, $x2 + 6, 10, $texto, $aFont, 'T', 'L', 0, '', false);
             }
