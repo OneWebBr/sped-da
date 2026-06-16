@@ -1128,7 +1128,7 @@ class Danfe extends DaCommon
             $UF     = $this->getTagValue($this->enderEmit, "UF");
             $texto  = $lgr . ", " . $nro . $cpl . "\n" . $bairro . " - "
                 . $CEP . "\n" . $mun . " - " . $UF . " "
-                . "Fone/Fax: " . $fone;
+                . "Fone: " . $fone;
             $this->pdf->textBox($x1, $y1, $tw, 8, $texto, $aFont, 'T', 'C', 0, '');
         }
 
@@ -1576,11 +1576,11 @@ class Danfe extends DaCommon
         $texto = $this->dest->getElementsByTagName("UF")->item(0)->nodeValue;
         $aFont = ['font' => $this->fontePadrao, 'size' => 10, 'style' => 'B'];
         $this->pdf->textBox($x, $y, $w, $h, $texto, $aFont, 'B', 'C', 0, '');
-        //FONE / FAX
+        //FONE
         $x     += $w;
         $w     = round(($maxW - $w1 - $wx - 8) / 2, 0);
         $w3    = $w;
-        $texto = 'FONE / FAX';
+        $texto = 'FONE';
         $aFont = ['font' => $this->fontePadrao, 'size' => 6, 'style' => ''];
         $this->pdf->textBox($x, $y, $w, $h, $texto, $aFont, 'T', 'L', 1, '');
         $texto = !empty($this->dest->getElementsByTagName("fone")->item(0)->nodeValue)
@@ -1762,10 +1762,10 @@ class Danfe extends DaCommon
         $texto = $this->entrega->getElementsByTagName("UF")->item(0)->nodeValue;
         $aFont = ['font' => $this->fontePadrao, 'size' => 10, 'style' => 'B'];
         $this->pdf->textBox($x, $y, $w, $h, $texto, $aFont, 'B', 'C', 0, '');
-        //FONE / FAX
+        //FONE
         $x     += $w;
         $w     = $maxW - $w - $w1;
-        $texto = 'FONE / FAX';
+        $texto = 'FONE';
         $aFont = ['font' => $this->fontePadrao, 'size' => 6, 'style' => ''];
         $this->pdf->textBox($x, $y, $w, $h, $texto, $aFont, 'T', 'L', 1, '');
         $texto = !empty($this->entrega->getElementsByTagName("fone")->item(0)->nodeValue) ?
@@ -1915,10 +1915,10 @@ class Danfe extends DaCommon
         $texto = $this->retirada->getElementsByTagName("UF")->item(0)->nodeValue;
         $aFont = ['font' => $this->fontePadrao, 'size' => 10, 'style' => 'B'];
         $this->pdf->textBox($x, $y, $w, $h, $texto, $aFont, 'B', 'C', 0, '');
-        //FONE / FAX
+        //FONE
         $x     += $w;
         $w     = $maxW - $w - $w1;
-        $texto = 'FONE / FAX';
+        $texto = 'FONE';
         $aFont = ['font' => $this->fontePadrao, 'size' => 6, 'style' => ''];
         $this->pdf->textBox($x, $y, $w, $h, $texto, $aFont, 'T', 'L', 1, '');
         $texto = !empty($this->retirada->getElementsByTagName("fone")->item(0)->nodeValue) ?
