@@ -1128,7 +1128,7 @@ class Danfe extends DaCommon
             $UF     = $this->getTagValue($this->enderEmit, "UF");
             $texto  = $lgr . ", " . $nro . $cpl . "\n" . $bairro . " - "
                 . $CEP . "\n" . $mun . " - " . $UF . " "
-                . "Fone/Fax: " . $fone;
+                . "Fone: " . $fone;
             $this->pdf->textBox($x1, $y1, $tw, 8, $texto, $aFont, 'T', 'C', 0, '');
         }
 
