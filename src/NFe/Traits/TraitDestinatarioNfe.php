@@ -135,9 +135,9 @@ trait TraitDestinatarioNfe
         $texto = $this->std->dest->enderDest->UF;
         $aFont = ['font' => $this->fontePadrao, 'size' => 10, 'style' => 'B'];
         $this->pdf->textBox($x, $y+2, $wuf, $h, $texto, $aFont, 'T', 'C', 0, '', true);
-        //FONE
+        //FONE / FAX
         $x += $wuf;
-        $texto = 'FONE';
+        $texto = 'FONE / FAX';
         $aFont = ['font' => $this->fontePadrao, 'size' => 6, 'style' => ''];
         $this->pdf->textBox($x, $y, $w6, $h, $texto, $aFont, 'T', 'L', 0, '', true);
         $texto = $this->std->dest->enderDest->fone ?? '';

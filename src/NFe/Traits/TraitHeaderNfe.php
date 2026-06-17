@@ -120,7 +120,7 @@ trait TraitHeaderNfe
             $UF     = $this->std->emit->enderEmit->UF;
             $texto  = $lgr . ", " . $nro . $cpl . "\n" . $bairro . " - "
                 . $CEP . "\n" . $mun . " - " . $UF . " "
-                . "Fone: " . $fone;
+                . "Fone/Fax: " . $fone;
             $this->pdf->textBox($x1-1, $y2, $tw, 8, $texto, $aFont, 'T', 'C', 0, '');
         }
         //####################################################################################
