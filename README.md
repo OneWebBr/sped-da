@@ -50,6 +50,21 @@ Para a geração dos documentos auxiliares devem feitas as seguintes consideraç
 * No caso especifico da NFC-e (Nota fiscal do consumidor) existe um outro pacote que poderá vir a ser usado, trata-se do [*"posprint"*](https://github.com/nfephp-org/posprint) devido ao fato desse documento auxiliar normalmente ser impresso em impressoras térmicas POS, que não trabalham adequadamente com PDF e devem receber os dados em sua pópria linguagem (RAW data). Dessa forma o pacote *"posprint"* poderá tornar-se ser uma das dependências desse pacote.
 * Para a conversão dos dados em PDF é necessário o uso de uma biblioteca que seja ativamente mantida, usada por um grande contingente de programadores e que atenda minimamente os PSR. Uma grande atenção deve ser dedicada a esse ponto pois com a inclusão do PHP7 podem surgir problemas de incompatibilidade com bibliotecas que não sejam mantidas atualizadas.
 
+## DanfeRtc
+
+Leiaute da NT 2026.010 (Reforma Tributária do Consumo). A classe `NFePHP\DA\NFe\Danfe` permanece com o leiaute atual; a `DanfeRtc` desenha com o `DanfeRtcPdf` (texto afastado da borda), trocado em `Danfe::novoPdf()`.
+
+```php
+$danfe = new \NFePHP\DA\NFe\DanfeRtc($xml);
+$pdf = $danfe->render();
+```
+
+Só é impresso o que existe no XML (NT 2026.010, item 4.4): os totais condicionados (FCP, DIFAL, ICMS monofásico, IBS/CBS monofásicos) entram apenas com valor maior que zero, e cada item mostra só as linhas de base, alíquota e valor dos tributos que tem.
+
+- Itens: rótulo em cada valor (`ICMS 63,00 / CBS 4,50`), na ordem do modelo da NT; pares que não cabem na coluna vão um por linha.
+- Monofasia (CST 620): padrão, retenção e retido anteriormente, ad valorem (R$ e %) e ad rem (quantidade e R$ por unidade tributável).
+- O quadro "Tipo de regime de apuração do IBS e da CBS" fica reservado até a tag ser publicada.
+
 ## Contribuindo
 Este é um projeto totalmente *OpenSource*, para usa-lo e modifica-lo você não paga absolutamente nada. Porém para continuarmos a mante-lo é necessário qua alguma contribuição seja feita, seja auxiliando na codificação, na documentação ou na realização de testes e identificação de falhas e BUGs.
 
@@ -84,7 +99,9 @@ Ou ainda alterando o composer.json do seu aplicativo inserindo:
 ```
 
 ## Forma de uso
-[DANFE](docs/DANFE.md)
+
+- [DANFE](docs/Danfe.md)
+- [DANFSe](docs/Danfse.md)
 
 ## Log de mudanças e versões
 Acompanhe o [CHANGELOG](CHANGELOG.md) para maiores informações sobre as alterações recentes.
