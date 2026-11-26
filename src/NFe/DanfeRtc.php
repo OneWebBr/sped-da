@@ -11,6 +11,27 @@ namespace NFePHP\DA\NFe;
  */
 class DanfeRtc extends Danfe
 {
+    private const DEFAULT_ITEM_FONT_SIZE = 6.0;
+
+    protected float $itemFontSize = self::DEFAULT_ITEM_FONT_SIZE;
+
+    /**
+     * Tamanho em pontos dos textos da grade de produtos, inclusive informações adicionais e tributos.
+     * Cabeçalhos e demais quadros mantêm seus tamanhos próprios.
+     */
+    public function setItemFontSize(float $fontSize = self::DEFAULT_ITEM_FONT_SIZE): self
+    {
+        if (!is_finite($fontSize) || $fontSize <= 0) {
+            throw new \InvalidArgumentException('O tamanho da fonte dos itens deve ser positivo e finito.');
+        }
+        if ($this->itemFontSize !== $fontSize) {
+            $this->itemFontSize = $fontSize;
+            $this->pdf = null;
+        }
+
+        return $this;
+    }
+
     /**
      * @param string $xml
      */
@@ -413,7 +434,7 @@ class DanfeRtc extends Danfe
         $lh = $medida['lh'];
         $hMiolo = $medida['hMiolo'];
         $prod = $det->getElementsByTagName('prod')->item(0);
-        $aFont = ['font' => $this->fontePadrao, 'size' => 6, 'style' => ''];
+        $aFont = ['font' => $this->fontePadrao, 'size' => $this->itemFontSize, 'style' => ''];
 
         $cursor = $x;
         foreach ($cols as $i => $largura) {
@@ -490,8 +511,8 @@ class DanfeRtc extends Danfe
     {
         $cols = $this->colunasItem($this->larguraUtil(1));
         $wDesc = max(10, $cols[0] - 1);
-        $aFont = ['font' => $this->fontePadrao, 'size' => 6, 'style' => ''];
-        $lh = 3.3;
+        $aFont = ['font' => $this->fontePadrao, 'size' => $this->itemFontSize, 'style' => ''];
+        $lh = 3.3 * ($this->itemFontSize / self::DEFAULT_ITEM_FONT_SIZE);
         $prod = $det->getElementsByTagName('prod')->item(0);
         $nome = $prod ? $this->getTagValue($prod, 'xProd') : '';
         $codigo = $prod ? $this->getTagValue($prod, 'cProd') : '';
@@ -731,8 +752,8 @@ class DanfeRtc extends Danfe
             }
         }
         // Par que não cabe na coluna (ad rem, retenção, valores grandes) vai um por linha: o textBox
-        // encolheria a fonte abaixo de 6 pt. A medida é a do texto na fonte do item, não a contagem de letras.
-        $this->pdf->setFont($this->fontePadrao, '', 6);
+        // encolheria a fonte configurada. A medida é a do texto na fonte do item, não a contagem de letras.
+        $this->pdf->setFont($this->fontePadrao, '', $this->itemFontSize);
         $linhas = [];
         for ($i = 0; $i < count($textos); $i++) {
             $par = $largura > 0 && isset($textos[$i + 1]) ? $textos[$i] . ' / ' . $textos[$i + 1] : '';
