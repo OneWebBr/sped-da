@@ -330,7 +330,9 @@ class DaCommon extends Common
     {
         ob_start();
         imagejpeg($image, null, 100);
-        imagedestroy($image);
+        if (PHP_VERSION_ID < 80000) {
+            imagedestroy($image); // no-op desde PHP 8.0; deprecated no 8.5
+        }
         $logo = ob_get_contents(); // read from buffer
         ob_end_clean();
         return 'data://text/plain;base64,'.base64_encode($logo);
