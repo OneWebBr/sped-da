@@ -1611,7 +1611,9 @@ class Fpdf181
         ob_start();
         imagepng($im);
         $data = ob_get_clean();
-        imagedestroy($im);
+        if (PHP_VERSION_ID < 80000) {
+            imagedestroy($im); // no-op desde PHP 8.0; deprecated no 8.5
+        }
         $f = fopen('php://temp', 'rb+');
         if (!$f) {
             $this->error('Unable to create memory stream');

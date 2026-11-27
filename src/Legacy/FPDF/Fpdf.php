@@ -1508,7 +1508,9 @@ class Fpdf
         if (!imagepng($im, $tmp)) {
             $this->error('Error while saving to temporary file');
         }
-        imagedestroy($im);
+        if (PHP_VERSION_ID < 80000) {
+            imagedestroy($im); // no-op desde PHP 8.0; deprecated no 8.5
+        }
         $info=$this->parsePNG($tmp);
         unlink($tmp);
         return $info;
